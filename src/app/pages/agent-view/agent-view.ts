@@ -4,13 +4,13 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { CardModule } from 'primeng/card';
 import { ButtonModule } from 'primeng/button';
 import { TagModule } from 'primeng/tag';
-import { DragDropModule } from 'primeng/dragdrop';
+// Removed DragDropModule - view-only dashboard
 import { FirestoreService, Task, Agent } from '../../services/firestore.service';
 
 @Component({
     selector: 'app-agent-view',
     standalone: true,
-    imports: [CommonModule, CardModule, ButtonModule, TagModule, DragDropModule],
+    imports: [CommonModule, CardModule, ButtonModule, TagModule],
     template: `
         <div class="grid">
             <div class="col-12">
@@ -31,15 +31,10 @@ import { FirestoreService, Task, Agent } from '../../services/firestore.service'
             <div class="col-12 md:col-6 lg" *ngFor="let column of columns">
                 <div class="card">
                     <h5>{{ column.label }} ({{ getTasksByColumn(column.value).length }})</h5>
-                    <div class="kanban-column" 
-                         pDroppable="tasks"
-                         (onDrop)="onDrop($event, column.value)">
+                    <div class="kanban-column">
                         
                         <div *ngFor="let task of getTasksByColumn(column.value)" 
-                             class="task-card mb-2"
-                             pDraggable="tasks"
-                             (onDragStart)="dragStart(task)"
-                             (onDragEnd)="dragEnd()">
+                             class="task-card mb-2">
                             
                             <p-card>
                                 <div class="font-bold mb-2">{{ task.title }}</div>
@@ -74,17 +69,13 @@ import { FirestoreService, Task, Agent } from '../../services/firestore.service'
             padding: 1rem;
         }
         .task-card {
-            cursor: move;
-        }
-        .task-card:hover {
-            opacity: 0.9;
+            cursor: default;
         }
     `]
 })
 export class AgentView implements OnInit {
     agent: Agent | null = null;
     tasks: Task[] = [];
-    draggedTask: Task | null = null;
 
     columns = [
         { value: 'backlog', label: 'Backlog' },
@@ -117,20 +108,6 @@ export class AgentView implements OnInit {
 
     getTasksByColumn(column: string): Task[] {
         return this.tasks.filter(t => t.column === column);
-    }
-
-    dragStart(task: Task) {
-        this.draggedTask = task;
-    }
-
-    dragEnd() {
-        this.draggedTask = null;
-    }
-
-    async onDrop(event: any, newColumn: string) {
-        if (this.draggedTask && this.draggedTask.id) {
-            await this.firestoreService.updateTask(this.draggedTask.id, { column: newColumn as any });
-        }
     }
 
     getStatusSeverity(status: string): 'success' | 'warning' | 'danger' | 'info' {
