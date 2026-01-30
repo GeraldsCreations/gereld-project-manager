@@ -7,6 +7,7 @@ import { TagModule } from 'primeng/tag';
 import { BadgeModule } from 'primeng/badge';
 import { TimelineModule } from 'primeng/timeline';
 import { FirestoreService, Task, Agent, TaskActivity } from '../../services/firestore.service';
+import { catchError, of } from 'rxjs';
 
 interface KanbanColumn {
     value: string;
@@ -426,7 +427,7 @@ export class AgentView implements OnInit {
             });
 
             // Load activities for this agent
-            this.firestoreService.getActivitiesByAgent(agentId, 15).subscribe(activities => {
+            this.firestoreService.getActivitiesByAgent(agentId, 15).pipe(catchError(() => of([]))).subscribe(activities => {
                 this.activities = activities;
             });
         }
