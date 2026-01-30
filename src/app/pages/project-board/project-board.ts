@@ -23,7 +23,7 @@ import { FirestoreService, Task, Project, Agent } from '../../services/firestore
                         <div class="ml-2">
                             <h2>{{ project?.name }}</h2>
                             <p class="text-color-secondary" *ngIf="project?.description">
-                                {{ project.description }}
+                                {{ project?.description }}
                             </p>
                         </div>
                     </div>
