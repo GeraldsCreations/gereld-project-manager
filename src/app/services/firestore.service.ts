@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { Firestore, collection, collectionData, doc, updateDoc, addDoc, deleteDoc, query, where } from '@angular/fire/firestore';
 import { Observable } from 'rxjs';
 
@@ -35,7 +35,7 @@ export interface Task {
     providedIn: 'root'
 })
 export class FirestoreService {
-    constructor(private firestore: Firestore) {}
+    private firestore = inject(Firestore);
 
     // Agents
     getAgents(): Observable<Agent[]> {
