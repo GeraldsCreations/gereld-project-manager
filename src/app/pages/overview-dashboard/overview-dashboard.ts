@@ -24,54 +24,51 @@ interface AgentWithStats extends Agent {
     standalone: true,
     imports: [CommonModule, CardModule, ButtonModule, TagModule, BadgeModule, ProgressBarModule],
     template: `
-        <div class="grid">
+        <div class="space-y-4">
             <!-- Hero Header -->
-            <div class="col-12">
-                <div class="card stats-card">
-                    <div class="flex align-items-center justify-content-between flex-wrap gap-3">
-                        <div>
-                            <h1 class="text-4xl font-bold mb-2">🍆 Gereld PM</h1>
-                            <p class="text-lg opacity-90">AI Agent Project Manager</p>
+            <div class="card stats-card">
+                <div class="flex align-items-center justify-content-between flex-wrap gap-3">
+                    <div>
+                        <h1 class="text-4xl font-bold mb-2">🍆 Gereld PM</h1>
+                        <p class="text-lg opacity-90">AI Agent Project Manager</p>
+                    </div>
+                    <div class="flex gap-4 flex-wrap">
+                        <div class="text-center">
+                            <div class="stats-card-value">{{ agentsWithStats.length }}</div>
+                            <div class="stats-card-label">Agents</div>
                         </div>
-                        <div class="flex gap-4 flex-wrap">
-                            <div class="text-center">
-                                <div class="stats-card-value">{{ agentsWithStats.length }}</div>
-                                <div class="stats-card-label">Agents</div>
-                            </div>
-                            <div class="text-center">
-                                <div class="stats-card-value">{{ getWorkingAgentsCount() }}</div>
-                                <div class="stats-card-label">Working</div>
-                            </div>
-                            <div class="text-center">
-                                <div class="stats-card-value">{{ getTotalActiveTasks() }}</div>
-                                <div class="stats-card-label">Active Tasks</div>
-                            </div>
-                            <div class="text-center">
-                                <div class="stats-card-value">{{ getOverallCompletion() }}%</div>
-                                <div class="stats-card-label">Overall</div>
-                            </div>
+                        <div class="text-center">
+                            <div class="stats-card-value">{{ getWorkingAgentsCount() }}</div>
+                            <div class="stats-card-label">Working</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="stats-card-value">{{ getTotalActiveTasks() }}</div>
+                            <div class="stats-card-label">Active Tasks</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="stats-card-value">{{ getOverallCompletion() }}%</div>
+                            <div class="stats-card-label">Overall</div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Agent Cards Grid -->
-            <div class="col-12">
-                <div class="card">
-                    <div class="flex align-items-center justify-content-between mb-3">
-                        <h2 class="m-0">Active Agents</h2>
-                        <p-button 
-                            label="Refresh" 
-                            icon="pi pi-refresh" 
-                            [outlined]="true"
-                            size="small">
-                        </p-button>
-                    </div>
+            <!-- Section Header -->
+            <div class="card">
+                <div class="flex align-items-center justify-content-between mb-3">
+                    <h2 class="m-0">Active Agents</h2>
+                    <p-button 
+                        label="Refresh" 
+                        icon="pi pi-refresh" 
+                        [outlined]="true"
+                        size="small">
+                    </p-button>
                 </div>
             </div>
             
-            <!-- Enhanced Agent Cards - Wider with more info -->
-            <div class="col-12 sm:col-6 lg:col-3" *ngFor="let agent of agentsWithStats">
+            <!-- Agent Cards Grid - Tailwind Grid -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div *ngFor="let agent of agentsWithStats">
                 <div class="agent-card-enhanced">
                     <p-card>
                         <!-- Card Header with Gradient -->
@@ -213,16 +210,14 @@ interface AgentWithStats extends Agent {
             </div>
 
             <!-- Empty State -->
-            <div class="col-12" *ngIf="agentsWithStats.length === 0">
-                <div class="card">
-                    <div class="empty-state">
-                        <div class="empty-state-icon">
-                            <i class="pi pi-users"></i>
-                        </div>
-                        <div class="text-xl font-semibold mb-2">No Agents Yet</div>
-                        <div class="empty-state-text">
-                            Add agents using the Gereld CLI to get started
-                        </div>
+            <div class="card" *ngIf="agentsWithStats.length === 0">
+                <div class="empty-state">
+                    <div class="empty-state-icon">
+                        <i class="pi pi-users"></i>
+                    </div>
+                    <div class="text-xl font-semibold mb-2">No Agents Yet</div>
+                    <div class="empty-state-text">
+                        Add agents using the Gereld CLI to get started
                     </div>
                 </div>
             </div>
