@@ -23,7 +23,9 @@ export class AppMenu {
             {
                 label: 'Gereld PM 🍆',
                 items: [
-                    { label: 'Overview', icon: 'pi pi-fw pi-chart-line', routerLink: ['/'] }
+                    { label: 'Overview', icon: 'pi pi-fw pi-chart-line', routerLink: ['/'] },
+                    { label: 'Agent View', icon: 'pi pi-fw pi-users', routerLink: ['/agents'] },
+                    { label: 'Project Board', icon: 'pi pi-fw pi-th-large', routerLink: ['/board'] }
                 ]
             }
         ];
