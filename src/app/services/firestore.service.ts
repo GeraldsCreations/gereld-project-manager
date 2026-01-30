@@ -1,5 +1,5 @@
 import { Injectable, inject } from '@angular/core';
-import { Firestore, collection, collectionData, doc, updateDoc, addDoc, deleteDoc, query, where } from '@angular/fire/firestore';
+import { Firestore, collection, collectionData, doc, updateDoc, addDoc, deleteDoc, query, where, orderBy, limit } from '@angular/fire/firestore';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 
@@ -30,6 +30,20 @@ export interface Task {
     dueDate?: Date;
     createdAt: Date;
     updatedAt: Date;
+}
+
+// NEW: Activity tracking interface
+export interface TaskActivity {
+    id?: string;
+    taskId: string;
+    taskTitle: string;
+    agentId: string;
+    agentName: string;
+    action: 'created' | 'moved' | 'completed' | 'assigned' | 'updated';
+    fromColumn?: string;
+    toColumn?: string;
+    timestamp: Date;
+    metadata?: any; // Additional context
 }
 
 @Injectable({
@@ -82,6 +96,46 @@ export class FirestoreService {
         return (collectionData(q, { idField: 'id' }) as Observable<any[]>).pipe(
             map(tasks => tasks.map(task => this.convertTaskDates(task)))
         );
+    }
+
+    // NEW: Activity tracking methods
+    getActivitiesByAgent(agentId: string, limitCount: number = 20): Observable<TaskActivity[]> {
+        const activitiesCol = collection(this.firestore, 'activities');
+        const q = query(
+            activitiesCol,
+            where('agentId', '==', agentId),
+            orderBy('timestamp', 'desc'),
+            limit(limitCount)
+        );
+        return (collectionData(q, { idField: 'id' }) as Observable<any[]>).pipe(
+            map(activities => activities.map(activity => ({
+                ...activity,
+                timestamp: activity.timestamp?.toDate() || new Date()
+            })))
+        );
+    }
+
+    getActivitiesByTask(taskId: string): Observable<TaskActivity[]> {
+        const activitiesCol = collection(this.firestore, 'activities');
+        const q = query(
+            activitiesCol,
+            where('taskId', '==', taskId),
+            orderBy('timestamp', 'desc')
+        );
+        return (collectionData(q, { idField: 'id' }) as Observable<any[]>).pipe(
+            map(activities => activities.map(activity => ({
+                ...activity,
+                timestamp: activity.timestamp?.toDate() || new Date()
+            })))
+        );
+    }
+
+    async logActivity(activity: Omit<TaskActivity, 'id' | 'timestamp'>): Promise<void> {
+        const activitiesCol = collection(this.firestore, 'activities');
+        await addDoc(activitiesCol, {
+            ...activity,
+            timestamp: new Date()
+        });
     }
 
     private convertTaskDates(task: any): Task {

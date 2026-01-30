@@ -1,0 +1,538 @@
+/**
+ * 🍆 Gereld PM Dashboard - Phase 2 Enhancements
+ * Additional styles for improved responsive design and new features
+ * Import this AFTER gereld-theme.scss
+ */
+
+/* ==========================================
+   RESPONSIVE LAYOUT IMPROVEMENTS
+   ========================================== */
+
+/* Better mobile spacing */
+@media (max-width: 575px) {
+    .card {
+        margin-bottom: 0.75rem;
+    }
+
+    .grid > [class*="col-"] {
+        padding: 0.5rem;
+    }
+
+    /* Smaller hero text on mobile */
+    .stats-card h1 {
+        font-size: 2rem !important;
+    }
+
+    .stats-card p {
+        font-size: 1rem !important;
+    }
+
+    .stats-card-value {
+        font-size: 1.75rem !important;
+    }
+
+    .stats-card-label {
+        font-size: 0.7rem !important;
+    }
+}
+
+/* Tablet optimizations */
+@media (min-width: 576px) and (max-width: 991px) {
+    /* Two-column layout for stats */
+    .stats-card .flex.gap-4 {
+        display: grid !important;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+    }
+
+    /* Better kanban scroll on tablet */
+    .kanban-container {
+        padding-bottom: 1.5rem;
+    }
+
+    .kanban-column {
+        flex: 0 0 300px;
+    }
+}
+
+/* Desktop enhancements */
+@media (min-width: 992px) {
+    /* Wider agent cards for more info */
+    .agent-card-enhanced {
+        min-height: 520px;
+    }
+
+    /* Sticky activity sidebar */
+    .activity-card {
+        position: sticky;
+        top: 1rem;
+    }
+}
+
+/* ==========================================
+   PROGRESS BAR ENHANCEMENTS
+   ========================================== */
+
+:root {
+    --progress-success: var(--status-working);
+    --progress-warning: var(--priority-medium);
+    --progress-danger: var(--priority-high);
+}
+
+/* Gradient progress bars */
+.p-progressbar-value {
+    background: linear-gradient(90deg, var(--gereld-purple) 0%, var(--gereld-purple-light) 100%) !important;
+    transition: width 0.5s ease-in-out;
+}
+
+/* Success state (>75%) */
+.progress-success .p-progressbar-value {
+    background: linear-gradient(90deg, var(--status-working) 0%, #34D399 100%) !important;
+}
+
+/* Warning state (50-75%) */
+.progress-warning .p-progressbar-value {
+    background: linear-gradient(90deg, var(--priority-medium) 0%, #FBBF24 100%) !important;
+}
+
+/* Danger state (<50%) */
+.progress-danger .p-progressbar-value {
+    background: linear-gradient(90deg, var(--priority-high) 0%, #F87171 100%) !important;
+}
+
+/* ==========================================
+   ENHANCED CARD LAYOUTS
+   ========================================== */
+
+/* Task breakdown stats grid */
+.task-breakdown {
+    background: var(--bg-surface);
+    border-radius: var(--radius-md);
+    padding: 1rem;
+    border: 1px solid var(--surface-200);
+}
+
+.task-breakdown .stat-item {
+    text-align: center;
+    padding: 0.5rem;
+    transition: transform var(--transition-fast);
+}
+
+.task-breakdown .stat-item:hover {
+    transform: scale(1.05);
+}
+
+/* Active tasks section */
+.active-tasks-section {
+    background: linear-gradient(135deg, var(--bg-card) 0%, var(--bg-surface) 100%);
+    border: 1px solid var(--surface-200);
+    border-radius: var(--radius-md);
+    padding: 0.75rem;
+}
+
+.mini-task-item {
+    background: var(--bg-card);
+    border-radius: var(--radius-sm);
+    padding: 0.5rem;
+    margin-bottom: 0.5rem;
+    transition: all var(--transition-fast);
+    border: 1px solid transparent;
+}
+
+.mini-task-item:hover {
+    background: white;
+    border-color: var(--gereld-purple-light);
+    transform: translateX(4px);
+    box-shadow: var(--shadow-sm);
+}
+
+.mini-task-item:last-child {
+    margin-bottom: 0;
+}
+
+/* ==========================================
+   ACTIVITY TIMELINE STYLES
+   ========================================== */
+
+.activity-card {
+    border-radius: var(--radius-lg);
+}
+
+/* Timeline customizations */
+.p-timeline .p-timeline-event {
+    padding-bottom: 1.5rem;
+}
+
+.p-timeline .p-timeline-event:last-child {
+    padding-bottom: 0;
+}
+
+.p-timeline-event-connector {
+    background: linear-gradient(180deg, var(--surface-300) 0%, var(--surface-200) 100%);
+}
+
+/* Timeline marker animations */
+.timeline-marker {
+    animation: markerPulse 2s ease-in-out infinite;
+}
+
+@keyframes markerPulse {
+    0%, 100% {
+        box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    }
+    50% {
+        box-shadow: 0 4px 12px rgba(124, 58, 237, 0.3);
+    }
+}
+
+/* Timeline content hover */
+.timeline-content {
+    transition: transform var(--transition-fast);
+    cursor: default;
+}
+
+.timeline-content:hover {
+    transform: translateX(4px);
+}
+
+.timeline-title {
+    font-weight: 600;
+    color: var(--text-primary);
+    line-height: 1.4;
+}
+
+.timeline-action {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    font-style: italic;
+}
+
+.timeline-timestamp {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+/* ==========================================
+   METRIC CARDS
+   ========================================== */
+
+.metric-card {
+    border-radius: var(--radius-lg);
+    transition: all var(--transition-base);
+    cursor: default;
+}
+
+.metric-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-lg);
+}
+
+.metric-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1rem;
+    font-size: 1.5rem;
+    transition: transform var(--transition-fast);
+}
+
+.metric-card:hover .metric-icon {
+    transform: scale(1.1) rotate(5deg);
+}
+
+.metric-value {
+    font-size: 2.5rem;
+    font-weight: 700;
+    line-height: 1;
+    margin-bottom: 0.5rem;
+    background: linear-gradient(135deg, var(--text-primary) 0%, var(--text-secondary) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.metric-label {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+/* ==========================================
+   EMPTY STATES
+   ========================================== */
+
+.empty-state-mini {
+    text-align: center;
+    padding: 2rem 1rem;
+    opacity: 0.6;
+}
+
+.empty-state-mini:hover {
+    opacity: 1;
+}
+
+/* ==========================================
+   MOBILE-SPECIFIC IMPROVEMENTS
+   ========================================== */
+
+@media (max-width: 767px) {
+    /* Stack hero stats vertically on mobile */
+    .stats-card .flex.gap-4 {
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .stats-card .text-center {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.75rem;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: var(--radius-md);
+    }
+
+    .stats-card .stats-card-value {
+        order: 2;
+    }
+
+    .stats-card .stats-card-label {
+        order: 1;
+        text-align: left;
+    }
+
+    /* Full-width buttons on mobile */
+    .p-button {
+        width: 100%;
+        justify-content: center;
+    }
+
+    /* Better spacing for mini tasks on mobile */
+    .mini-task-item {
+        padding: 0.75rem;
+    }
+
+    .mini-task-title {
+        font-size: 0.8rem;
+    }
+
+    /* Horizontal scroll hint for kanban */
+    .kanban-container::after {
+        content: '← Swipe to view all columns →';
+        position: sticky;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        text-align: center;
+        padding: 0.5rem;
+        background: rgba(124, 58, 237, 0.1);
+        color: var(--gereld-purple);
+        font-size: 0.75rem;
+        font-weight: 600;
+        border-radius: var(--radius-sm);
+        margin-top: 1rem;
+    }
+
+    /* Hide scroll hint on desktop */
+    @media (min-width: 768px) {
+        .kanban-container::after {
+            display: none;
+        }
+    }
+}
+
+/* ==========================================
+   TOUCH IMPROVEMENTS
+   ========================================== */
+
+@media (hover: none) and (pointer: coarse) {
+    /* Larger tap targets for mobile */
+    .p-button {
+        min-height: 44px;
+        padding: 0.75rem 1rem;
+    }
+
+    .mini-task-item {
+        min-height: 44px;
+    }
+
+    .timeline-content {
+        padding-left: 1.5rem;
+    }
+
+    /* Remove hover effects on touch devices */
+    .agent-card-enhanced:hover,
+    .metric-card:hover,
+    .mini-task-item:hover {
+        transform: none;
+    }
+}
+
+/* ==========================================
+   PRINT STYLES
+   ========================================== */
+
+@media print {
+    /* Hide interactive elements */
+    .p-button,
+    .status-badge,
+    .p-badge {
+        display: none !important;
+    }
+
+    /* Flatten cards */
+    .card {
+        box-shadow: none !important;
+        border: 1px solid #ddd;
+        break-inside: avoid;
+    }
+
+    /* Optimize colors for print */
+    .stats-card {
+        background: white !important;
+        color: black !important;
+    }
+
+    .agent-card-header {
+        background: #f5f3ff !important;
+        color: black !important;
+    }
+
+    /* Show all kanban columns */
+    .kanban-container {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 1rem;
+        overflow: visible;
+    }
+
+    .kanban-column {
+        flex: none;
+        page-break-inside: avoid;
+    }
+}
+
+/* ==========================================
+   ACCESSIBILITY ENHANCEMENTS
+   ========================================== */
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+    .card {
+        border: 2px solid var(--text-primary);
+    }
+
+    .p-progressbar {
+        border: 1px solid var(--text-primary);
+    }
+
+    .timeline-marker {
+        border: 2px solid white;
+    }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+
+    .metric-card:hover,
+    .agent-card-enhanced:hover {
+        transform: none;
+    }
+}
+
+/* Focus visible for keyboard navigation */
+:focus-visible {
+    outline: 3px solid var(--gereld-purple);
+    outline-offset: 2px;
+    border-radius: var(--radius-sm);
+}
+
+/* ==========================================
+   LOADING STATES
+   ========================================== */
+
+.skeleton-loader {
+    background: linear-gradient(
+        90deg,
+        var(--surface-200) 0%,
+        var(--surface-100) 50%,
+        var(--surface-200) 100%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 1.5s ease-in-out infinite;
+    border-radius: var(--radius-md);
+}
+
+@keyframes shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+}
+
+/* Loading spinner for activity feed */
+.activity-loading {
+    text-align: center;
+    padding: 2rem;
+    color: var(--text-secondary);
+}
+
+.activity-loading i {
+    font-size: 2rem;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+/* ==========================================
+   UTILITY CLASSES
+   ========================================== */
+
+.text-gradient-purple {
+    background: linear-gradient(135deg, var(--gereld-purple) 0%, var(--gereld-purple-light) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.card-hover-lift {
+    transition: transform var(--transition-base), box-shadow var(--transition-base);
+}
+
+.card-hover-lift:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-lg);
+}
+
+.flex-center {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.truncate-2-lines {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.truncate-3-lines {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
