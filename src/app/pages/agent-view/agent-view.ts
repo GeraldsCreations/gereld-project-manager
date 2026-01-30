@@ -222,6 +222,134 @@ interface KanbanColumn {
                     </ng-template>
                 </div>
             </div>
+
+            <!-- Completed Tasks Timeline Section -->
+            <div class="col-12">
+                <div class="card">
+                    <div class="flex align-items-center justify-content-between mb-4">
+                        <div>
+                            <h2 class="m-0 mb-2">✅ Completed Tasks Timeline</h2>
+                            <p class="text-sm text-color-secondary m-0">
+                                All completed tasks with reports and deliverables
+                            </p>
+                        </div>
+                        <div class="flex align-items-center gap-2">
+                            <p-badge 
+                                [value]="getCompletedTasks().length.toString()" 
+                                severity="success"
+                                styleClass="text-lg px-3 py-2">
+                            </p-badge>
+                        </div>
+                    </div>
+
+                    <div *ngIf="getCompletedTasks().length > 0; else noCompletedTasks">
+                        <p-timeline [value]="getCompletedTasks()" align="left" styleClass="completed-timeline">
+                            <ng-template pTemplate="marker" let-task>
+                                <div class="completed-task-marker">
+                                    <i class="pi pi-check-circle"></i>
+                                </div>
+                            </ng-template>
+                            
+                            <ng-template pTemplate="content" let-task>
+                                <div class="completed-task-card">
+                                    <!-- Task Header -->
+                                    <div class="flex align-items-start justify-content-between gap-3 mb-3">
+                                        <div class="flex-1">
+                                            <h3 class="completed-task-title">{{ task.title }}</h3>
+                                            <div class="flex align-items-center gap-2 flex-wrap mt-2">
+                                                <p-tag 
+                                                    [value]="task.priority" 
+                                                    [severity]="getPrioritySeverity(task.priority)"
+                                                    styleClass="text-xs">
+                                                </p-tag>
+                                                <p-tag 
+                                                    *ngIf="task.documentType && task.documentType !== 'none'"
+                                                    [value]="getDocumentTypeLabel(task.documentType)" 
+                                                    severity="info"
+                                                    icon="pi pi-file"
+                                                    styleClass="text-xs">
+                                                </p-tag>
+                                            </div>
+                                        </div>
+                                        <div class="completed-timestamp">
+                                            <i class="pi pi-calendar mr-1"></i>
+                                            {{ formatCompletedDate(task.completedAt || task.updatedAt) }}
+                                        </div>
+                                    </div>
+
+                                    <!-- Task Description -->
+                                    <div class="completed-task-description" *ngIf="task.description">
+                                        {{ task.description }}
+                                    </div>
+
+                                    <!-- Document/Report Content -->
+                                    <div *ngIf="task.reportContent" class="document-preview">
+                                        <div class="document-preview-header">
+                                            <i class="pi pi-file-edit mr-2"></i>
+                                            <strong>Report/Document</strong>
+                                        </div>
+                                        <div class="document-content">
+                                            {{ task.reportContent }}
+                                        </div>
+                                    </div>
+
+                                    <!-- External Document Link -->
+                                    <div *ngIf="task.documentUrl" class="document-link-card">
+                                        <i class="pi pi-link mr-2"></i>
+                                        <a [href]="task.documentUrl" target="_blank" class="document-link">
+                                            View External Document
+                                            <i class="pi pi-external-link ml-2"></i>
+                                        </a>
+                                    </div>
+
+                                    <!-- Attachments -->
+                                    <div *ngIf="task.attachments && task.attachments.length > 0" class="attachments-section">
+                                        <div class="attachments-header">
+                                            <i class="pi pi-paperclip mr-2"></i>
+                                            <strong>Attachments ({{ task.attachments.length }})</strong>
+                                        </div>
+                                        <div class="attachments-list">
+                                            <div *ngFor="let attachment of task.attachments" class="attachment-item">
+                                                <i class="pi pi-file mr-2"></i>
+                                                <a [href]="attachment.url" target="_blank">
+                                                    {{ attachment.name }}
+                                                </a>
+                                                <span class="text-xs text-color-secondary ml-2">({{ attachment.type }})</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Task Metadata Footer -->
+                                    <div class="completed-task-footer">
+                                        <div class="flex align-items-center gap-3 flex-wrap text-xs text-color-secondary">
+                                            <span>
+                                                <i class="pi pi-clock mr-1"></i>
+                                                Completed {{ formatRelativeTime(task.completedAt || task.updatedAt) }}
+                                            </span>
+                                            <span>
+                                                <i class="pi pi-calendar mr-1"></i>
+                                                Created {{ task.createdAt | date:'MMM d, yyyy' }}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </ng-template>
+                        </p-timeline>
+                    </div>
+
+                    <ng-template #noCompletedTasks>
+                        <div class="empty-state">
+                            <div class="empty-state-icon">
+                                <i class="pi pi-inbox"></i>
+                            </div>
+                            <div class="text-lg font-semibold mb-2">No Completed Tasks Yet</div>
+                            <div class="text-sm text-color-secondary">
+                                Completed tasks will appear here with their reports and deliverables
+                            </div>
+                        </div>
+                    </ng-template>
+                </div>
+            </div>
         </div>
     `,
     styles: [`
@@ -369,6 +497,177 @@ interface KanbanColumn {
             border: 3px solid rgba(255, 255, 255, 0.3);
         }
 
+        /* Completed Tasks Timeline Styles */
+        :host ::ng-deep .completed-timeline .p-timeline-event-connector {
+            background: linear-gradient(180deg, #10B981 0%, #34D399 100%);
+            width: 3px;
+        }
+
+        .completed-task-marker {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #10B981 0%, #34D399 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.25rem;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+        }
+
+        .completed-task-card {
+            background: var(--bg-surface);
+            border-radius: var(--radius-lg);
+            padding: 1.5rem;
+            border: 1px solid var(--surface-200);
+            transition: all var(--transition-base);
+            margin-bottom: 1rem;
+        }
+
+        .completed-task-card:hover {
+            background: white;
+            box-shadow: var(--shadow-md);
+            transform: translateX(4px);
+        }
+
+        .completed-task-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin: 0;
+            line-height: 1.4;
+        }
+
+        .completed-timestamp {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            white-space: nowrap;
+            background: var(--bg-surface);
+            padding: 0.5rem 0.75rem;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--surface-200);
+        }
+
+        .completed-task-description {
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+            margin-bottom: 1rem;
+            padding: 1rem;
+            background: white;
+            border-radius: var(--radius-md);
+            border-left: 3px solid var(--status-working);
+        }
+
+        .document-preview {
+            background: #F9FAFB;
+            border: 2px solid #E5E7EB;
+            border-radius: var(--radius-md);
+            padding: 1rem;
+            margin-top: 1rem;
+        }
+
+        .document-preview-header {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--gereld-purple);
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+        }
+
+        .document-content {
+            font-size: 0.9rem;
+            line-height: 1.7;
+            color: var(--text-primary);
+            white-space: pre-wrap;
+            background: white;
+            padding: 1rem;
+            border-radius: var(--radius-sm);
+            border: 1px solid #E5E7EB;
+            max-height: 400px;
+            overflow-y: auto;
+            font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
+        }
+
+        .document-link-card {
+            background: linear-gradient(135deg, #EDE9FE 0%, #F5F3FF 100%);
+            border: 2px solid var(--gereld-purple-light);
+            border-radius: var(--radius-md);
+            padding: 1rem;
+            margin-top: 1rem;
+            display: flex;
+            align-items: center;
+        }
+
+        .document-link {
+            color: var(--gereld-purple);
+            font-weight: 600;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            transition: color var(--transition-fast);
+        }
+
+        .document-link:hover {
+            color: var(--gereld-purple-dark);
+            text-decoration: underline;
+        }
+
+        .attachments-section {
+            background: #F0F9FF;
+            border: 2px solid #BFDBFE;
+            border-radius: var(--radius-md);
+            padding: 1rem;
+            margin-top: 1rem;
+        }
+
+        .attachments-header {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #2563EB;
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+        }
+
+        .attachments-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .attachment-item {
+            background: white;
+            padding: 0.75rem;
+            border-radius: var(--radius-sm);
+            border: 1px solid #BFDBFE;
+            display: flex;
+            align-items: center;
+            transition: background var(--transition-fast);
+        }
+
+        .attachment-item:hover {
+            background: #F0F9FF;
+        }
+
+        .attachment-item a {
+            color: #2563EB;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .attachment-item a:hover {
+            text-decoration: underline;
+        }
+
+        .completed-task-footer {
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--surface-200);
+        }
+
         /* Responsive */
         @media (max-width: 991px) {
             .kanban-container {
@@ -378,6 +677,14 @@ interface KanbanColumn {
             .activity-card {
                 position: static;
                 max-height: none;
+            }
+
+            .completed-task-card {
+                padding: 1rem;
+            }
+
+            .document-content {
+                max-height: 300px;
             }
         }
 
@@ -390,6 +697,20 @@ interface KanbanColumn {
 
             .metric-value {
                 font-size: 2rem;
+            }
+
+            .completed-task-title {
+                font-size: 1.1rem;
+            }
+
+            .completed-timestamp {
+                font-size: 0.75rem;
+                padding: 0.4rem 0.6rem;
+            }
+
+            .document-content {
+                font-size: 0.85rem;
+                max-height: 250px;
             }
         }
     `]
@@ -534,5 +855,38 @@ export class AgentView implements OnInit {
 
     goBack() {
         this.router.navigate(['/']);
+    }
+
+    getCompletedTasks(): Task[] {
+        // Filter completed tasks and sort by completion date (most recent first)
+        return this.tasks
+            .filter(t => t.column === 'done')
+            .sort((a, b) => {
+                const dateA = a.completedAt || a.updatedAt;
+                const dateB = b.completedAt || b.updatedAt;
+                return dateB.getTime() - dateA.getTime();
+            });
+    }
+
+    getDocumentTypeLabel(type: string): string {
+        const labels: { [key: string]: string } = {
+            'report': 'Report',
+            'document': 'Document',
+            'code': 'Code',
+            'analysis': 'Analysis',
+            'summary': 'Summary'
+        };
+        return labels[type] || type;
+    }
+
+    formatCompletedDate(date: Date): string {
+        const options: Intl.DateTimeFormatOptions = { 
+            year: 'numeric', 
+            month: 'short', 
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        };
+        return date.toLocaleDateString('en-US', options);
     }
 }

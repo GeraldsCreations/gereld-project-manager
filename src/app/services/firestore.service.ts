@@ -30,6 +30,12 @@ export interface Task {
     dueDate?: Date;
     createdAt: Date;
     updatedAt: Date;
+    completedAt?: Date; // When task was marked as done
+    // Document/Report fields
+    documentType?: 'report' | 'document' | 'code' | 'analysis' | 'summary' | 'none';
+    documentUrl?: string; // URL to external document
+    reportContent?: string; // Inline report/document content (markdown/text)
+    attachments?: { name: string; url: string; type: string }[]; // Multiple attachments
 }
 
 // NEW: Activity tracking interface
@@ -143,7 +149,8 @@ export class FirestoreService {
             ...task,
             createdAt: task.createdAt?.toDate() || new Date(),
             updatedAt: task.updatedAt?.toDate() || new Date(),
-            dueDate: task.dueDate?.toDate() || undefined
+            dueDate: task.dueDate?.toDate() || undefined,
+            completedAt: task.completedAt?.toDate() || undefined
         };
     }
 

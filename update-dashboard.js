@@ -6,8 +6,9 @@
  *   node update-dashboard.js add-agent "Agent Name" --status working --task "Current task"
  *   node update-dashboard.js add-project "Project Name" "Description"
  *   node update-dashboard.js add-task "Task Title" --project "project-id" --agent "agent-id" --column in-progress --priority high
+ *   node update-dashboard.js add-task "Completed Task" --project "proj-id" --agent "agent-id" --column done --document-type report --report-content "Report text"
  *   node update-dashboard.js update-agent "agent-id" --status idle
- *   node update-dashboard.js update-task "task-id" --column done
+ *   node update-dashboard.js update-task "task-id" --column done --document-type analysis --report-content "Analysis results"
  *   node update-dashboard.js list-agents
  *   node update-dashboard.js list-projects
  *   node update-dashboard.js list-tasks
@@ -89,8 +90,39 @@ const addTask = async (title, params) => {
         updatedAt: Timestamp.now()
     };
     
+    // Document/Report fields
+    if (params['document-type']) {
+        task.documentType = params['document-type'];
+    }
+    if (params['document-url']) {
+        task.documentUrl = params['document-url'];
+    }
+    if (params['report-content']) {
+        task.reportContent = params['report-content'];
+    }
+    
+    // Handle attachments (format: "name,url,type")
+    if (params.attachment) {
+        const attachments = Array.isArray(params.attachment) 
+            ? params.attachment 
+            : [params.attachment];
+        
+        task.attachments = attachments.map(att => {
+            const [name, url, type] = att.split(',');
+            return { name: name.trim(), url: url.trim(), type: type.trim() };
+        });
+    }
+    
+    // Set completedAt if task is marked as done
+    if (task.column === 'done') {
+        task.completedAt = Timestamp.now();
+    }
+    
     const docRef = await addDoc(collection(db, 'tasks'), task);
     console.log(`✅ Task added: ${title} (ID: ${docRef.id})`);
+    if (task.documentType) {
+        console.log(`   📄 Document Type: ${task.documentType}`);
+    }
     return docRef.id;
 };
 
@@ -111,10 +143,39 @@ const updateTask = async (id, params) => {
     if (params.priority) updates.priority = params.priority;
     if (params.status) updates.status = params.status;
     if (params.agent) updates.agentId = params.agent;
+    
+    // Document/Report fields
+    if (params['document-type']) updates.documentType = params['document-type'];
+    if (params['document-url']) updates.documentUrl = params['document-url'];
+    if (params['report-content']) updates.reportContent = params['report-content'];
+    
+    // Handle attachments
+    if (params.attachment) {
+        const attachments = Array.isArray(params.attachment) 
+            ? params.attachment 
+            : [params.attachment];
+        
+        updates.attachments = attachments.map(att => {
+            const [name, url, type] = att.split(',');
+            return { name: name.trim(), url: url.trim(), type: type.trim() };
+        });
+    }
+    
+    // Set completedAt when moved to done
+    if (params.column === 'done') {
+        updates.completedAt = Timestamp.now();
+    }
+    
     updates.updatedAt = Timestamp.now();
     
     await updateDoc(doc(db, 'tasks', id), updates);
     console.log(`✅ Task updated: ${id}`);
+    if (updates.documentType) {
+        console.log(`   📄 Document Type: ${updates.documentType}`);
+    }
+    if (params.column === 'done') {
+        console.log(`   ✅ Marked as completed`);
+    }
 };
 
 const listAgents = async () => {
@@ -205,17 +266,52 @@ const main = async () => {
 Commands:
   add-agent <name> [--status idle|working|blocked] [--task "Task text"]
   add-project <name> [description]
-  add-task <title> --project <id> --agent <id> [--column backlog|todo|in-progress|review|done] [--priority low|medium|high]
+  add-task <title> --project <id> --agent <id> [options]
   update-agent <id> [--status idle|working|blocked] [--task "Task text"]
-  update-task <id> [--column backlog|todo|in-progress|review|done] [--priority low|medium|high]
+  update-task <id> [options]
   list-agents
   list-projects
   list-tasks
 
+Task Options:
+  --column <backlog|todo|in-progress|review|done>
+  --priority <low|medium|high>
+  --description "Task description"
+  --document-type <report|document|code|analysis|summary|none>
+  --document-url "https://example.com/doc.pdf"
+  --report-content "Full report text content..."
+  --attachment "filename,url,mimetype" (can be used multiple times)
+
 Examples:
+  # Basic task
   node update-dashboard.js add-agent "Growth Research Agent" --status working --task "Analyzing LSM market"
   node update-dashboard.js add-project "Vuka Win" "South Africa user growth"
-  node update-dashboard.js list-agents
+  
+  # Task with inline report
+  node update-dashboard.js add-task "Market Analysis Complete" \\
+    --project proj_123 --agent agent_456 --column done --priority high \\
+    --document-type analysis \\
+    --report-content "# Q1 Analysis
+Revenue up 23%
+Customer acquisition cost down 15%"
+  
+  # Task with external document
+  node update-dashboard.js add-task "Design Complete" \\
+    --project proj_123 --agent agent_456 --column done \\
+    --document-type document \\
+    --document-url "https://docs.google.com/document/d/abc123"
+  
+  # Task with attachments
+  node update-dashboard.js add-task "Research Complete" \\
+    --project proj_123 --agent agent_456 --column done \\
+    --attachment "Report.pdf,https://storage.example.com/report.pdf,application/pdf" \\
+    --attachment "Data.csv,https://storage.example.com/data.csv,text/csv"
+  
+  # Update task to completed with report
+  node update-dashboard.js update-task task_789 \\
+    --column done \\
+    --document-type report \\
+    --report-content "Task completed successfully. All tests passing."
                 `);
         }
     } catch (error) {
