@@ -13,7 +13,9 @@ export const appRoutes: Routes = [
         component: AppLayout,
         children: [
             { path: '', component: OverviewDashboard },
+            { path: 'agents', component: AgentView },
             { path: 'agent/:id', component: AgentView },
+            { path: 'board', component: ProjectBoard },
             { path: 'project/:id', component: ProjectBoard },
             { path: 'uikit', loadChildren: () => import('./app/pages/uikit/uikit.routes') },
             { path: 'documentation', component: Documentation },

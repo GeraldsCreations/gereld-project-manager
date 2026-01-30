@@ -1,6 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { Firestore, collection, collectionData, doc, updateDoc, addDoc, deleteDoc, query, where } from '@angular/fire/firestore';
 import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 
 export interface Agent {
     id?: string;
@@ -40,31 +41,56 @@ export class FirestoreService {
     // Agents
     getAgents(): Observable<Agent[]> {
         const agentsCol = collection(this.firestore, 'agents');
-        return collectionData(agentsCol, { idField: 'id' }) as Observable<Agent[]>;
+        return (collectionData(agentsCol, { idField: 'id' }) as Observable<any[]>).pipe(
+            map(agents => agents.map(agent => ({
+                ...agent,
+                lastUpdated: agent.lastUpdated?.toDate() || new Date()
+            })))
+        );
     }
 
     // Projects
     getProjects(): Observable<Project[]> {
         const projectsCol = collection(this.firestore, 'projects');
-        return collectionData(projectsCol, { idField: 'id' }) as Observable<Project[]>;
+        return (collectionData(projectsCol, { idField: 'id' }) as Observable<any[]>).pipe(
+            map(projects => projects.map(project => ({
+                ...project,
+                createdAt: project.createdAt?.toDate() || new Date()
+            })))
+        );
     }
 
     // Tasks
     getTasks(): Observable<Task[]> {
         const tasksCol = collection(this.firestore, 'tasks');
-        return collectionData(tasksCol, { idField: 'id' }) as Observable<Task[]>;
+        return (collectionData(tasksCol, { idField: 'id' }) as Observable<any[]>).pipe(
+            map(tasks => tasks.map(task => this.convertTaskDates(task)))
+        );
     }
 
     getTasksByAgent(agentId: string): Observable<Task[]> {
         const tasksCol = collection(this.firestore, 'tasks');
         const q = query(tasksCol, where('agentId', '==', agentId));
-        return collectionData(q, { idField: 'id' }) as Observable<Task[]>;
+        return (collectionData(q, { idField: 'id' }) as Observable<any[]>).pipe(
+            map(tasks => tasks.map(task => this.convertTaskDates(task)))
+        );
     }
 
     getTasksByProject(projectId: string): Observable<Task[]> {
         const tasksCol = collection(this.firestore, 'tasks');
         const q = query(tasksCol, where('projectId', '==', projectId));
-        return collectionData(q, { idField: 'id' }) as Observable<Task[]>;
+        return (collectionData(q, { idField: 'id' }) as Observable<any[]>).pipe(
+            map(tasks => tasks.map(task => this.convertTaskDates(task)))
+        );
+    }
+
+    private convertTaskDates(task: any): Task {
+        return {
+            ...task,
+            createdAt: task.createdAt?.toDate() || new Date(),
+            updatedAt: task.updatedAt?.toDate() || new Date(),
+            dueDate: task.dueDate?.toDate() || undefined
+        };
     }
 
     async updateTask(taskId: string, updates: Partial<Task>): Promise<void> {
