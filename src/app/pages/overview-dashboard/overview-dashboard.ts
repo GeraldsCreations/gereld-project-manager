@@ -71,7 +71,7 @@ interface AgentWithStats extends Agent {
             </div>
             
             <!-- Enhanced Agent Cards - Wider with more info -->
-            <div class="col-12 lg:col-6" *ngFor="let agent of agentsWithStats">
+            <div class="col-12 md:col-6 lg:col-3" *ngFor="let agent of agentsWithStats">
                 <div class="agent-card-enhanced">
                     <p-card>
                         <!-- Card Header with Gradient -->
